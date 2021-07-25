@@ -1,4 +1,3 @@
-
 //화면을 그리는 역할
 const render = data => {
   let table = document.querySelector('#tbodyId')
@@ -13,13 +12,13 @@ const render = data => {
       for (let j = 0; j < 6; j++) {
         let createTd = document.createElement('td')
         createTd.id = `num${j + 1}`
-        createTd.class = `black`
         createTr.appendChild(createTd);
       }
       table.appendChild(createTr);
     }
   }
   renderTable();
+
 
   //페이징
   const paging = () => {
@@ -28,6 +27,7 @@ const render = data => {
     let prevPage = `<a href = '#' id='prev'>이전</a>`
     let nextPage = `<a href = '#' id="next">다음</a>`
     let endPage = `<a href = '#' id="end">마지막</a>`
+    let currentPage=0
 
     $(pageNum).append(startPage);
     $(pageNum).append(prevPage);
@@ -37,68 +37,63 @@ const render = data => {
     }
     $(pageNum).append(nextPage);
     $(pageNum).append(endPage);
-  }
-  paging();
-
-  const renderData = (data, sidx, currentPage) => { //테이블에 json 값 넣기 sidx:10개씩 
-
-    let firstIndex = data[0].num //첫번째 인덱스
-    let lastIndex = totalData - dataPerPage + 1 //총데이터
-    let prevPage=currentPage-1;
-    let nextPage=currentPage+1;
-
-
-
-    for (let i = 0; i < totalPage; i++) { //질문 json column index로 가져오는 법
-
-      $('#' + String(i + 1)).children('#num1').text(data[i + sidx].num)
-      $('#' + String(i + 1)).children('#num2').text(data[i + sidx].title)
-      $('#' + String(i + 1)).children('#num3').text(data[i + sidx].author)
-      $('#' + String(i + 1)).children('#num4').text(data[i + sidx].date)
-      $('#' + String(i + 1)).children('#num5').text(data[i + sidx].type)
-      $('#' + String(i + 1)).children('#num6').text(data[i + sidx].ip_address)
-    }
+    let firstIndex = (data[0].num) - 1 //첫번째 인덱스
+    let lastIndex = parseInt(totalData / dataPerPage) - 1 //총데이터
+    
+    let pageSelector2 = document.querySelectorAll('span');
+    pageSelector2.forEach((target) => { //페이징 이벤트
+      target.addEventListener('click', e => {
+        currentPage=e.target.id-1
+        renderData(data,currentPage); //인덱스가 10개씩 되도록 안그럼 2페이지에 2번부터 나와
+        e.target.style.color = "red"
+        // $('.list').addClass('red')????
+      })
+    })
 
     let pageSelector1 = document.querySelectorAll('a')
-    pageSelector1.forEach((target, currentPage) => {
+    pageSelector1.forEach((target) => {
       target.addEventListener('click', e => {
-        
-
-        // let prevPage = parseInt(e.target.id) - parseInt(1)
-        // let nextPage = parseInt(e.target.id) + parseInt(1)
-        // let prevPage=data[(e.target.id-1)].num;
-        // let nextPage=currentPage+1
 
         if (e.target.id == "start") {
-          renderData(data, firstIndex - 1, currentPage - 1);
+          renderData(data, firstIndex);
         }
         else if (e.target.id == "prev") {
-          renderData(data, (prevPage+1) * dataPerPage, currentPage - 1);
-          console.log(e.target.id);
+          currentPage = currentPage - 1
+          if ((currentPage) < 0) {
+            currentPage = 0
+          }
+          renderData(data, currentPage);
         }
         else if (e.target.id == "next") {
-          renderData(data, (nextPage+1) * dataPerPage, currentPage - 1);
+          currentPage = currentPage + 1
+          if (currentPage > lastIndex) {
+            currentPage = lastIndex
+          }
+          renderData(data, currentPage);
           console.log(e.target.id);
         }
         else if (e.target.id == "end") {
-          renderData(data, lastIndex - 1, currentPage - 1);
+          renderData(data, lastIndex);
         }
       })
     })
-
-
-    let pageSelector2 = document.querySelectorAll('span');
-    pageSelector2.forEach((target, currentPage) => { //페이징 이벤트
-      target.addEventListener('click', e => {
-        console.log(currentPage+1);
-        renderData(data, ((e.target.innerText) - 1) * dataPerPage, currentPage - 1); //인덱스가 10개씩 되도록 안그럼 2페이지에 2번부터 나와
-        e.target.style.color = "red"
-        // $('.list').addClass('red')
-        // return $('.list').removeClass('red')
-      })
-    })
   }
-  renderData(data, 0 * 10, 1);
+
+  paging();
+
+  const renderData = (data, currentPage) => { //테이블에 json 값 넣기 sidx:10개씩 
+
+    for (let i = 0; i < dataPerPage; i++) { //질문 json column index로 가져오는 법
+
+      $('#' + String(i + 1)).children('#num1').text(data[i + (currentPage * dataPerPage)].num)
+      $('#' + String(i + 1)).children('#num2').text(data[i + (currentPage * dataPerPage)].title)
+      $('#' + String(i + 1)).children('#num3').text(data[i + (currentPage * dataPerPage)].author)
+      $('#' + String(i + 1)).children('#num4').text(data[i + (currentPage * dataPerPage)].date)
+      $('#' + String(i + 1)).children('#num5').text(data[i + (currentPage * dataPerPage)].type)
+      $('#' + String(i + 1)).children('#num6').text(data[i + (currentPage * dataPerPage)].ip_address)
+    }
+  }
+  renderData(data, 0);
 }
 
 //데이터를 부르는 역할
