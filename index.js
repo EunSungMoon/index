@@ -13,6 +13,7 @@ const render = data => {
       for (let j = 0; j < 6; j++) {
         let createTd = document.createElement('td')
         createTd.id = `num${j + 1}`
+        createTd.class = `black`
         createTr.appendChild(createTd);
       }
       table.appendChild(createTr);
@@ -30,8 +31,9 @@ const render = data => {
 
     $(pageNum).append(startPage);
     $(pageNum).append(prevPage);
+
     for (let j = 0; j < totalPage; j++) {
-      pageNum.innerHTML += `<a href = '#' id= 'num${j + 1}'> ${j + 1} </a>`;
+      pageNum.innerHTML += `<span href = '#' id= '${j + 1}' class='list'>${j + 1} </span>`;
     }
     $(pageNum).append(nextPage);
     $(pageNum).append(endPage);
@@ -40,12 +42,12 @@ const render = data => {
 
   const renderData = (data, sidx, currentPage) => { //테이블에 json 값 넣기 sidx:10개씩 
 
-    let startIndex = (currentPage - 1) * dataPerPage; //시작 인덱스
-    let endIndex = startIndex + 10; //페이지 마지막 인덱스
     let firstIndex = data[0].num //첫번째 인덱스
-    let lastIndex = totalData //총데이터
-    let prevPage = currentPage - 1;
-    let nextPage = currentPage + 1;
+    let lastIndex = totalData - dataPerPage + 1 //총데이터
+    let prevPage=currentPage-1;
+    let nextPage=currentPage+1;
+
+
 
     for (let i = 0; i < totalPage; i++) { //질문 json column index로 가져오는 법
 
@@ -57,20 +59,45 @@ const render = data => {
       $('#' + String(i + 1)).children('#num6').text(data[i + sidx].ip_address)
     }
 
-    let pageSelector = document.querySelectorAll('a');
-
-    console.log("다음"+nextPage);
-    console.log("이전"+prevPage);
-
-    pageSelector.forEach((target, currentPage) => { //페이징 이벤트
+    let pageSelector1 = document.querySelectorAll('a')
+    pageSelector1.forEach((target, currentPage) => {
       target.addEventListener('click', e => {
-        renderData(data, ((e.target.innerText) - 1) * dataPerPage, (currentPage-1)); //인덱스가 10개씩 되도록 안그럼 2페이지에 2번부터 나와
-        console.log(e.target.id);
-        console.log((currentPage-1));
-        e.target.style.color = "red"
+        
+
+        // let prevPage = parseInt(e.target.id) - parseInt(1)
+        // let nextPage = parseInt(e.target.id) + parseInt(1)
+        // let prevPage=data[(e.target.id-1)].num;
+        // let nextPage=currentPage+1
+
+        if (e.target.id == "start") {
+          renderData(data, firstIndex - 1, currentPage - 1);
+        }
+        else if (e.target.id == "prev") {
+          renderData(data, (prevPage+1) * dataPerPage, currentPage - 1);
+          console.log(e.target.id);
+        }
+        else if (e.target.id == "next") {
+          renderData(data, (nextPage+1) * dataPerPage, currentPage - 1);
+          console.log(e.target.id);
+        }
+        else if (e.target.id == "end") {
+          renderData(data, lastIndex - 1, currentPage - 1);
+        }
       })
     })
-  };
+
+
+    let pageSelector2 = document.querySelectorAll('span');
+    pageSelector2.forEach((target, currentPage) => { //페이징 이벤트
+      target.addEventListener('click', e => {
+        console.log(currentPage+1);
+        renderData(data, ((e.target.innerText) - 1) * dataPerPage, currentPage - 1); //인덱스가 10개씩 되도록 안그럼 2페이지에 2번부터 나와
+        e.target.style.color = "red"
+        // $('.list').addClass('red')
+        // return $('.list').removeClass('red')
+      })
+    })
+  }
   renderData(data, 0 * 10, 1);
 }
 
@@ -78,4 +105,4 @@ const render = data => {
 const loader = url => {
   return $.getJSON(url, render);
 };
-loader('/index/table.json');
+loader('/table.json');
