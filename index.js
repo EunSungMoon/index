@@ -1,6 +1,7 @@
 //화면을 그리는 역할
 const render = data => {
-  let table = document.querySelector('#tbodyId')
+  // let table = document.querySelector('#tbodyId')
+  let table = $('.tbodyId')
   let dataPerPage = 10; //한 페이지에 나타낼 데이터 개수
   let totalData = data.length; //총 데이터 개수
   let totalPage = Math.ceil(totalData / dataPerPage); //총 페이지 개수
@@ -14,7 +15,7 @@ const render = data => {
         createTd.id = `num${j + 1}`
         createTr.appendChild(createTd);
       }
-      table.appendChild(createTr);
+      table.append(createTr);
     }
   }
   renderTable();
@@ -22,16 +23,15 @@ const render = data => {
 
   //페이징
   const paging = () => {
-    let pageNum = document.querySelector('#pagingNum');
+    let pageNum = document.querySelector('.pagingNum');
     let startPage = `<a href = '#' id='start'>처음</a>`
     let prevPage = `<a href = '#' id='prev'>이전</a>`
     let nextPage = `<a href = '#' id="next">다음</a>`
     let endPage = `<a href = '#' id="end">마지막</a>`
-    let currentPage=0
+    let currentPage = 0
 
     $(pageNum).append(startPage);
     $(pageNum).append(prevPage);
-
     for (let j = 0; j < totalPage; j++) {
       pageNum.innerHTML += `<span href = '#' id= '${j + 1}' class='list'>${j + 1} </span>`;
     }
@@ -39,12 +39,12 @@ const render = data => {
     $(pageNum).append(endPage);
     let firstIndex = (data[0].num) - 1 //첫번째 인덱스
     let lastIndex = parseInt(totalData / dataPerPage) - 1 //총데이터
-    
+
     let pageSelector2 = document.querySelectorAll('span');
     pageSelector2.forEach((target) => { //페이징 이벤트
       target.addEventListener('click', e => {
-        currentPage=e.target.id-1
-        renderData(data,currentPage); //인덱스가 10개씩 되도록 안그럼 2페이지에 2번부터 나와
+        currentPage = e.target.id - 1
+        renderData(data, currentPage); //인덱스가 10개씩 되도록 안그럼 2페이지에 2번부터 나와
         e.target.style.color = "red"
         // $('.list').addClass('red')????
       })
